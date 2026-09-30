@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Runner Game</title>
+
+<style>
+
+/* =====================================================
+   ALAP
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #222;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+}
+
+
+/* =====================================================
+   JÁTÉK
+===================================================== */
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 500px;
+    margin-top: 50px;
+    overflow: hidden;
+
+    background: linear-gradient(
+        to bottom,
+        #4db8f2 0%,
+        #a8e3ff 65%,
+        #dff7ff 65%,
+        #79c943 65%,
+        #5da832 100%
+    );
+
+    border-bottom: 5px solid #333;
+
+    transition: background 2s ease;
+}
+
+
+/* =====================================================
+   NAP
+===================================================== */
+
+#sun {
+    position: absolute;
+
+    width: 85px;
+    height: 85px;
+
+    right: 100px;
+    top: 45px;
+
+    background: #FFD83D;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 25px #FFD83D,
+        0 0 55px rgba(255,216,61,0.7);
+
+    transition: opacity 2s;
+}
+
+
+/* =====================================================
+   HOLD
+===================================================== */
+
+#moon {
+    position: absolute;
+
+    width: 75px;
+    height: 75px;
+
+    right: 110px;
+    top: 50px;
+
+    background: #fff;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 25px rgba(255,255,255,0.8);
+
+    opacity: 0;
+
+    transition: opacity 2s;
+}
+
+
+/* =====================================================
+   FELHŐK
+===================================================== */
+
+.cloud {
+    position: absolute;
+
+    width: 150px;
+    height: 45px;
+
+    background: white;
+
+    border-radius: 50px;
+
+    opacity: 0.9;
+
+    animation: cloudMove linear infinite;
+}
+
+.cloud::before,
+.cloud::after {
+    content: "";
+
+    position: absolute;
+
+    background: white;
+
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 65px;
+    height: 65px;
+
+    left: 25px;
+    bottom: 15px;
+}
+
+.cloud::after {
+    width: 80px;
+    height: 80px;
+
+    right: 20px;
+    bottom: 5px;
+}
+
+.cloud1 {
+    top: 80px;
+    left: -200px;
+
+    animation-duration: 32s;
+}
+
+.cloud2 {
+    top: 150px;
+    left: -300px;
+
+    transform: scale(0.7);
+
+    animation-duration: 45s;
+    animation-delay: 5s;
+}
+
+.cloud3 {
+    top: 45px;
+    left: -250px;
+
+    transform: scale(0.5);
+
+    animation-duration: 50s;
+    animation-delay: 15s;
+}
+
+@keyframes cloudMove {
+
+    from {
+        left: -250px;
+    }
+
+    to {
+        left: calc(100vw + 250px);
+    }
+}
+
+
+/* =====================================================
+   HEGYEK
+===================================================== */
+
+.mountains {
+    position: absolute;
+
+    bottom: 125px;
+
+    width: 100%;
+    height: 160px;
+
+    overflow: hidden;
+}
+
+.mountain {
+    position: absolute;
+
+    bottom: 0;
+
+    width: 0;
+    height: 0;
+
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+
+    border-bottom: 170px solid #619661;
+
+    transition: border-bottom-color 2s;
+}
+
+
+/* havas hegy */
+
+.mountain.snow {
+    border-bottom-color: #619661;
+}
+
+.mountain.snow::before {
+    content: "";
+
+    position: absolute;
+
+    left: -58px;
+    bottom: 120px;
+
+    width: 0;
+    height: 0;
+
+    border-left: 58px solid transparent;
+    border-right: 58px solid transparent;
+
+    border-bottom: 65px solid white;
+}
+
+
+.mountain1 {
+    left: 3%;
+}
+
+.mountain2 {
+    left: 25%;
+    transform: scale(1.25);
+}
+
+.mountain3 {
+    left: 52%;
+    transform: scale(0.85);
+}
+
+.mountain4 {
+    left: 73%;
+    transform: scale(1.15);
+}
+
+.mountain5 {
+    left: 90%;
+    transform: scale(0.75);
+}
+
+
+/* =====================================================
+   MADARAK
+===================================================== */
+
+.bird {
+    position: absolute;
+
+    width: 50px;
+    height: 25px;
+
+    display: none;
+
+    z-index: 3;
+}
+
+.bird::before,
+.bird::after {
+    content: "";
+
+    position: absolute;
+
+    width: 25px;
+    height: 12px;
+
+    border-top: 4px solid #333;
+
+    border-radius: 50%;
+}
+
+.bird::before {
+    left: 0;
+    transform: rotate(20deg);
+}
+
+.bird::after {
+    right: 0;
+    transform: rotate(-20deg);
+}
+
+.bird.fly {
+    display: block;
+
+    animation:
+        birdFly 8s linear forwards;
+}
+
+@keyframes birdFly {
+
+    from {
+        left: -80px;
+    }
+
+    to {
+        left: calc(100vw + 80px);
+    }
+}
+
+
+/* =====================================================
+   FŰ
+===================================================== */
+
+.grass {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 125px;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 8px,
+            rgba(0,80,0,0.15) 9px,
+            transparent 10px
+        );
+}
+
+
+/* =====================================================
+   EMBER
+===================================================== */
+
+#player {
+    position: absolute;
+
+    left: 120px;
+    bottom: 125px;
+
+    width: 50px;
+    height: 95px;
+
+    z-index: 10;
+}
+
+
+/* fej */
+
+.head {
+    position: absolute;
+
+    width: 38px;
+    height: 38px;
+
+    background: #ffd0a6;
+
+    border-radius: 50%;
+
+    top: 0;
+    left: 6px;
+
+    border: 2px solid #d99d75;
+}
+
+
+/* haj */
+
+.head::before {
+    content: "";
+
+    position: absolute;
+
+    width: 40px;
+    height: 18px;
+
+    background: #3b2417;
+
+    top: -3px;
+    left: -3px;
+
+    border-radius:
+        20px 20px 5px 5px;
+}
+
+
+/* szem */
+
+.head::after {
+    content: "";
+
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    background: #222;
+
+    border-radius: 50%;
+
+    right: 7px;
+    top: 18px;
+}
+
+
+/* test */
+
+.body {
+    position: absolute;
+
+    width: 35px;
+    height: 43px;
+
+    background: #2878d0;
+
+    top: 34px;
+    left: 8px;
+
+    border-radius:
+        8px 8px 4px 4px;
+}
+
+
+/* kar */
+
+.arm {
+    position: absolute;
+
+    width: 10px;
+    height: 38px;
+
+    background: #ffd0a6;
+
+    top: 39px;
+
+    border-radius: 10px;
+}
+
+.arm.left {
+    left: 1px;
+
+    transform: rotate(20deg);
+}
+
+.arm.right {
+    right: 1px;
+
+    transform: rotate(-20deg);
+}
+
+
+/* lábak */
+
+.leg {
+    position: absolute;
+
+    width: 11px;
+    height: 35px;
+
+    background: #333;
+
+    top: 72px;
+
+    border-radius: 5px;
+}
+
+.leg.left {
+    left: 12px;
+}
+
+.leg.right {
+    left: 28px;
+}
+
+
+/* futás */
+
+#player.running .leg.left {
+    animation:
+        leg1 0.18s infinite alternate;
+}
+
+#player.running .leg.right {
+    animation:
+        leg2 0.18s infinite alternate;
+}
+
+@keyframes leg1 {
+
+    from {
+        transform: rotate(25deg);
+    }
+
+    to {
+        transform: rotate(-25deg);
+    }
+}
+
+@keyframes leg2 {
+
+    from {
+        transform: rotate(-25deg);
+    }
+
+    to {
+        transform: rotate(25deg);
+    }
+}
+
+
+/* =====================================================
+   DOBOZOK
+===================================================== */
+
+.obstacle {
+    position: absolute;
+
+    z-index: 10;
+
+    border-style: solid;
+
+    border-radius: 5px;
+
+    box-shadow:
+        inset 0 0 0 2px rgba(0,0,0,0.12);
+}
+
+
+.obstacle::before {
+    content: "×";
+
+    position: absolute;
+
+    color: rgba(0,0,0,0.25);
+
+    font-size: 32px;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+/* =====================================================
+   PONTSZÁM
+===================================================== */
+
+#score {
+    position: absolute;
+
+    top: 20px;
+    left: 30px;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    color: #222;
+
+    z-index: 30;
+}
+
+
+/* =====================================================
+   IDŐSZAK
+===================================================== */
+
+#timeText {
+    position: absolute;
+
+    top: 58px;
+    left: 30px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #333;
+
+    z-index: 30;
+
+    transition: color 2s;
+}
+
+
+/* =====================================================
+   HIGH SCORE
+===================================================== */
+
+#highScore {
+    position: absolute;
+
+    right: 25px;
+    bottom: 15px;
+
+    font-size: 24px;
+
+    font-weight: bold;
+
+    color: #222;
+
+    z-index: 30;
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+#message {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    text-align: center;
+
+    font-size: 45px;
+
+    font-weight: bold;
+
+    color: #222;
+
+    display: none;
+
+    z-index: 50;
+
+    background:
+        rgba(255,255,255,0.92);
+
+    padding: 30px 50px;
+
+    border-radius: 20px;
+}
+
+#message small {
+    display: block;
+
+    font-size: 18px;
+
+    margin-top: 15px;
+
+    font-weight: normal;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="game">
+
+
+    <!-- NAP -->
+
+    <div id="sun"></div>
+
+
+    <!-- HOLD -->
+
+    <div id="moon"></div>
+
+
+    <!-- FELHŐK -->
+
+    <div class="cloud cloud1"></div>
+
+    <div class="cloud cloud2"></div>
+
+    <div class="cloud cloud3"></div>
+
+
+    <!-- HEGYEK -->
+
+    <div class="mountains">
+
+        <div class="mountain mountain1 snow"></div>
+
+        <div class="mountain mountain2"></div>
+
+        <div class="mountain mountain3 snow"></div>
+
+        <div class="mountain mountain4"></div>
+
+        <div class="mountain mountain5 snow"></div>
+
+    </div>
+
+
+    <!-- MADÁR -->
+
+    <div id="bird" class="bird"></div>
+
+
+    <!-- FŰ -->
+
+    <div class="grass"></div>
+
+
+    <!-- PONT -->
+
+    <div id="score">
+        Pont: 0
+    </div>
+
+
+    <!-- IDŐSZAK -->
+
+    <div id="timeText">
+        🌅 Reggel
+    </div>
+
+
+    <!-- HIGH SCORE -->
+
+    <div id="highScore">
+        High Score: 0
+    </div>
+
+
+    <!-- EMBER -->
+
+    <div id="player" class="running">
+
+        <div class="head"></div>
+
+        <div class="body"></div>
+
+        <div class="arm left"></div>
+
+        <div class="arm right"></div>
+
+        <div class="leg left"></div>
+
+        <div class="leg right"></div>
+
+    </div>
+
+
+    <!-- GAME OVER -->
+
+    <div id="message">
+
+        GAME OVER
+
+        <small>
+            SPACE vagy bal egérgomb az újrakezdéshez!
+        </small>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   ELEMEK
+===================================================== */
+
+const game =
+    document.getElementById("game");
+
+const player =
+    document.getElementById("player");
+
+const scoreText =
+    document.getElementById("score");
+
+const highScoreText =
+    document.getElementById("highScore");
+
+const timeText =
+    document.getElementById("timeText");
+
+const message =
+    document.getElementById("message");
+
+const sun =
+    document.getElementById("sun");
+
+const moon =
+    document.getElementById("moon");
+
+const bird =
+    document.getElementById("bird");
+
+
+/* =====================================================
+   VÁLTOZÓK
+===================================================== */
+
+let jumping = false;
+
+let gameOver = false;
+
+let score = 0;
+
+let highScore =
+    Number(
+        localStorage.getItem("highScore")
+    ) || 0;
+
+
+/*
+   Alapsebesség
+*/
+
+let obstacleSpeed = 6;
+
+
+/*
+   Doboztömbök
+*/
+
+let obstacles = [];
+
+
+/*
+   Következő akadály
+*/
+
+let nextObstacleTime = 0;
+
+
+/*
+   Legutóbbi időszak
+
+   0 = reggel
+   1 = este
+*/
+
+let currentPeriod = 0;
+
+
+/* =====================================================
+   HIGH SCORE
+===================================================== */
+
+highScoreText.textContent =
+    "High Score: " +
+    highScore;
+
+
+/* =====================================================
+   IDŐSZAK VÁLTÁSA
+===================================================== */
+
+function updateTimeOfDay() {
+
+    /*
+       Pont alapján számolunk.
+
+       1-10   = reggel
+       11-20  = este
+       21-30  = reggel
+       31-40  = este
+       stb.
+    */
+
+    if (score === 0) {
+
+        currentPeriod = 0;
+
+    } else {
+
+        currentPeriod =
+            Math.floor(
+                (score - 1) / 10
+            ) % 2;
+    }
+
+
+    /*
+       REGGEL
+    */
+
+    if (currentPeriod === 0) {
+
+        game.style.background =
+            "linear-gradient(" +
+            "to bottom," +
+            "#4db8f2 0%," +
+            "#a8e3ff 65%," +
+            "#dff7ff 65%," +
+            "#79c943 65%," +
+            "#5da832 100%)";
+
+
+        sun.style.opacity = "1";
+
+        moon.style.opacity = "0";
+
+
+        timeText.textContent =
+            "🌅 Reggel";
+
+        timeText.style.color =
+            "#333";
+    }
+
+
+    /*
+       ESTE
+    */
+
+    else {
+
+        game.style.background =
+            "linear-gradient(" +
+            "to bottom," +
+            "#172554 0%," +
+            "#334a82 65%," +
+            "#59658c 65%," +
+            "#405f36 65%," +
+            "#304d29 100%)";
+
+
+        sun.style.opacity = "0";
+
+        moon.style.opacity = "1";
+
+
+        timeText.textContent =
+            "🌙 Este";
+
+        timeText.style.color =
+            "#fff";
+    }
+}
+
+
+/* =====================================================
+   UGRÁS
+===================================================== */
+
+function jump() {
+
+    /*
+       Ha Game Over van,
+       akkor újraindítjuk.
+    */
+
+    if (gameOver) {
+
+        restart();
+
+        return;
+    }
+
+
+    /*
+       Ne lehessen dupla ugrás.
+    */
+
+    if (jumping) return;
+
+
+    jumping = true;
+
+
+    let height = 0;
+
+    let goingUp = true;
+
+
+    const jumpInterval =
+        setInterval(() => {
+
+
+            /*
+               FELFELÉ
+            */
+
+            if (goingUp) {
+
+                height += 10;
+
+
+                player.style.bottom =
+                    (125 + height) +
+                    "px";
+
+
+                if (height >= 180) {
+
+                    goingUp = false;
+                }
+            }
+
+
+            /*
+               LEFELÉ
+            */
+
+            else {
+
+                height -= 10;
+
+
+                player.style.bottom =
+                    (125 + height) +
+                    "px";
+
+
+                if (height <= 0) {
+
+                    clearInterval(
+                        jumpInterval
+                    );
+
+
+                    player.style.bottom =
+                        "125px";
+
+
+                    jumping = false;
+                }
+            }
+
+        }, 20);
+}
+
+
+/* =====================================================
+   SPACE
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.code === "Space"
+        ) {
+
+            event.preventDefault();
+
+            jump();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   BAL KATTINTÁS
+===================================================== */
+
+document.addEventListener(
+    "mousedown",
+    function(event) {
+
+        if (
+            event.button === 0
+        ) {
+
+            jump();
+        }
+
+    }
+);
+
+
+/* =====================================================
+   DOBOZ SZÍNEK
+===================================================== */
+
+const boxColors = [
+
+    "#a9632c",
+
+    "#c47a35",
+
+    "#8f4f25",
+
+    "#b85c2e",
+
+    "#76502f",
+
+    "#d18a3d",
+
+    "#9c6b3c"
+
+];
+
+
+/* =====================================================
+   EGY DOBOZ
+===================================================== */
+
+function createBox(
+    rightPosition,
+    bottomPosition,
+    width,
+    height
+) {
+
+    const box =
+        document.createElement(
+            "div"
+        );
+
+
+    box.classList.add(
+        "obstacle"
+    );
+
+
+    /*
+       Véletlen szín
+    */
+
+    const color =
+        boxColors[
+            Math.floor(
+                Math.random() *
+                boxColors.length
+            )
+        ];
+
+
+    box.style.width =
+        width + "px";
+
+
+    box.style.height =
+        height + "px";
+
+
+    box.style.background =
+        color;
+
+
+    box.style.borderColor =
+        "#5a3217";
+
+
+    box.style.right =
+        rightPosition + "px";
+
+
+    box.style.bottom =
+        bottomPosition + "px";
+
+
+    game.appendChild(box);
+
+
+    return box;
+}
+
+
+/* =====================================================
+   AKADÁLY CSOPORT
+===================================================== */
+
+function createObstacleGroup() {
+
+    /*
+       FONTOS:
+
+       Maximum 2 doboz lehet egymáson.
+
+       Így az akadály mindig
+       átugorható marad.
+    */
+
+    const stackHeight =
+        Math.random() < 0.30
+            ? 2
+            : 1;
+
+
+    /*
+       Az alsó doboz mérete.
+    */
+
+    const width =
+        45 +
+        Math.random() * 20;
+
+
+    const height =
+        40 +
+        Math.random() * 15;
+
+
+    /*
+       Alsó doboz
+    */
+
+    const bottomBox =
+        createBox(
+            -100,
+            125,
+            width,
+            height
+        );
+
+
+    /*
+       Az akadály csoport objektuma.
+
+       Ez azért fontos, mert az egész
+       akadály csak 1 pontot ad.
+    */
+
+    const group = {
+
+        boxes: [bottomBox],
+
+        right: -100,
+
+        counted: false
+    };
+
+
+    /*
+       Második doboz
+
+       Ugyanakkora szélességgel,
+       ezért stabilan rákerül.
+    */
+
+    if (
+        stackHeight === 2
+    ) {
+
+        const topBox =
+            createBox(
+                -100,
+                125 + height,
+                width,
+                height
+            );
+
+
+        group.boxes.push(
+            topBox
+        );
+    }
+
+
+    /*
+       Elmentjük a csoportot.
+    */
+
+    obstacles.push(group);
+}
+
+
+/* =====================================================
+   DOBOZOK MOZGATÁSA
+===================================================== */
+
+function moveObstacles() {
+
+    if (gameOver) return;
+
+
+    const now =
+        Date.now();
+
+
+    /*
+       Új akadály létrehozása.
+
+       A távolság minimum 1000 ms,
+       így nem rak egymásba
+       lehetetlen akadályokat.
+    */
+
+    if (
+        now >
+        nextObstacleTime
+    ) {
+
+        createObstacleGroup();
+
+
+        /*
+           Legalább 1 másodperc
+           a következő akadályig.
+        */
+
+        nextObstacleTime =
+            now +
+            1000 +
+            Math.random() * 900;
+    }
+
+
+    /*
+       Akadályok mozgatása
+    */
+
+    for (
+        let i =
+            obstacles.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const group =
+            obstacles[i];
+
+
+        /*
+           Csoport mozgatása
+        */
+
+        group.right +=
+            obstacleSpeed;
+
+
+        /*
+           Minden doboz ugyanannyit mozog,
+           ezért egymáson maradnak.
+        */
+
+        group.boxes.forEach(
+            box => {
+
+                box.style.right =
+                    group.right +
+                    "px";
+
+            }
+        );
+
+
+        /*
+           PONT
+
+           Nagyon fontos:
+
+           Egy teljes akadálycsoport
+           csak egyszer ad pontot.
+        */
+
+        if (
+            !group.counted &&
+            group.right >
+            window.innerWidth + 100
+        ) {
+
+            group.counted = true;
+
+
+            score++;
+
+
+            scoreText.textContent =
+                "Pont: " +
+                score;
+
+
+            /*
+               High Score
+            */
+
+            if (
+                score >
+                highScore
+            ) {
+
+                highScore =
+                    score;
+
+
+                highScoreText.textContent =
+                    "High Score: " +
+                    highScore;
+
+
+                localStorage.setItem(
+                    "highScore",
+                    highScore
+                );
+            }
+
+
+            /*
+               IDŐSZAK
+
+               Csak itt változik,
+               amikor ténylegesen
+               megszereztük a pontot.
+            */
+
+            updateTimeOfDay();
+        }
+
+
+        /*
+           ÜTKÖZÉS
+
+           Ha bármelyik dobozzal
+           ütközik az ember,
+           vége.
+        */
+
+        const playerRect =
+            player.getBoundingClientRect();
+
+
+        for (
+            const box of group.boxes
+        ) {
+
+            const boxRect =
+                box.getBoundingClientRect();
+
+
+            if (
+
+                playerRect.left <
+                boxRect.right &&
+
+                playerRect.right >
+                boxRect.left &&
+
+                playerRect.top <
+                boxRect.bottom &&
+
+                playerRect.bottom >
+                boxRect.top
+
+            ) {
+
+                endGame();
+
+                return;
+            }
+        }
+
+
+        /*
+           Régi akadály törlése
+        */
+
+        if (
+            group.right >
+            window.innerWidth + 250
+        ) {
+
+            group.boxes.forEach(
+                box => {
+
+                    box.remove();
+
+                }
+            );
+
+
+            obstacles.splice(
+                i,
+                1
+            );
+        }
+    }
+
+
+    /*
+       Sebesség fokozatos növelése.
+
+       Nem ugrik nagyot,
+       ezért nem lesz hirtelen
+       lehetetlen a játék.
+    */
+
+    obstacleSpeed =
+        6 +
+        Math.min(
+            Math.floor(score / 10),
+            8
+        );
+
+
+    requestAnimationFrame(
+        moveObstacles
+    );
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function endGame() {
+
+    gameOver = true;
+
+
+    player.classList.remove(
+        "running"
+    );
+
+
+    message.style.display =
+        "block";
+}
+
+
+/* =====================================================
+   ÚJRAINDÍTÁS
+===================================================== */
+
+function restart() {
+
+    gameOver = false;
+
+    jumping = false;
+
+    score = 0;
+
+    obstacleSpeed = 6;
+
+
+    scoreText.textContent =
+        "Pont: 0";
+
+
+    player.style.bottom =
+        "125px";
+
+
+    player.classList.add(
+        "running"
+    );
+
+
+    message.style.display =
+        "none";
+
+
+    /*
+       Összes régi akadály törlése
+    */
+
+    obstacles.forEach(
+        group => {
+
+            group.boxes.forEach(
+                box => {
+
+                    box.remove();
+
+                }
+            );
+
+        }
+    );
+
+
+    obstacles = [];
+
+
+    /*
+       Első akadály
+    */
+
+    nextObstacleTime =
+        Date.now() + 1200;
+
+
+    /*
+       Reggelről indulunk
+    */
+
+    updateTimeOfDay();
+
+
+    requestAnimationFrame(
+        moveObstacles
+    );
+}
+
+
+/* =====================================================
+   MADÁR
+===================================================== */
+
+function createBird() {
+
+    if (gameOver) return;
+
+
+    bird.classList.remove(
+        "fly"
+    );
+
+
+    /*
+       Animáció újraindítása
+    */
+
+    void bird.offsetWidth;
+
+
+    bird.style.top =
+        (
+            50 +
+            Math.random() * 130
+        ) + "px";
+
+
+    bird.classList.add(
+        "fly"
+    );
+}
+
+
+function randomBird() {
+
+    const time =
+        5000 +
+        Math.random() * 8000;
+
+
+    setTimeout(
+        () => {
+
+            createBird();
+
+            randomBird();
+
+        },
+        time
+    );
+}
+
+
+/* =====================================================
+   INDÍTÁS
+===================================================== */
+
+updateTimeOfDay();
+
+
+nextObstacleTime =
+    Date.now() + 1200;
+
+
+moveObstacles();
+
+
+randomBird();
+
+
+</script>
+
+</body><h1>szia hogy vagy?</h1>
+</html>
